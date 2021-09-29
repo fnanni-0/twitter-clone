@@ -14,7 +14,7 @@ const TweetModal = (props) => {
   const [rulesID, setRulesID] = useState(0);
   const [preview, setPreview] = useState({ image: "", video: "", media: null });
 
-  const account = useSelector((state) => state.profile.user.account);
+  const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
@@ -87,8 +87,7 @@ const TweetModal = (props) => {
                 onClick={async () => {
                   setIsTweetDisabled(true);
                   // preview.media preview.video preview.image
-                  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
-                  const social = new ethers.Contract(socialAddress, socialContractAbi, signer);
+                  const social = new ethers.Contract(socialAddress, socialContractAbi, user.signer);
                   await social.post(text, rulesID);
 
                   setIsTweetDisabled(false);

@@ -8,6 +8,7 @@ import { SET_USER, SET_THEME } from "../../redux/actions";
 import { logo } from "./paths";
 // import { Row, Col } from "../styles/common";
 import { Row, Col } from "antd";
+import { ethers } from "ethers";
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -50,7 +51,8 @@ const SignIn = (props) => {
       // Will open the MetaMask UI
       // You should disable this button while the request is pending!
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      dispatch({ type: SET_USER, payload: {account: accounts[0]} });
+      const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+      dispatch({ type: SET_USER, payload: {account: accounts[0], signer: signer} });
       dispatch({ type: SET_THEME, payload: "default" });
       history.push("/home");
       // Move to profile or feed page.
