@@ -5,11 +5,14 @@ import { Route, Redirect } from "react-router-dom";
 
 const PrivateRoute = (props) => {
   const { homeAuthenticated } = props;
-  const token = useSelector((state) => state.profile.user.token);
+  const account = useSelector((state) => state.profile.user.account);
   let isAuthenticated = false;
   try {
-    jwt.verify(token, process.env.REACT_APP_SECRET_KEY);
-    isAuthenticated = true;
+    if (account !== undefined) {
+      isAuthenticated = true;
+    } else {
+      isAuthenticated = false;
+    }
   } catch (err) {
     isAuthenticated = false;
   }

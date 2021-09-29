@@ -104,26 +104,6 @@ const MenuBar = () => {
             </NavLink>
           );
         })}
-        <MenuItem
-          color={theme.color}
-          style={{ cursor: "pointer" }}
-          onClick={() =>
-            dispatch({
-              type: SET_THEME,
-              payload: mode === "dark" ? "default" : "dark",
-            })
-          }
-        >
-          <div>
-            <Icon
-              d={dark}
-              width="26.25px"
-              height="26.25px"
-              fill={theme.color}
-            />
-            <MenuTitle>{mode === "dark" ? "Light" : "Dark"} mode</MenuTitle>
-          </div>
-        </MenuItem>
         <div style={{ marginBottom: "10px" }}></div>
         {window.matchMedia("(max-width: 768px)").matches ? (
           <Button

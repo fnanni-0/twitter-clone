@@ -2,26 +2,26 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import LoginForm from "./loginForm";
 import Icon from "../icon";
-import { LogoWrapper, Motto, Button, Flex } from "../styles/signin";
+import { Button, Flex } from "../styles/signin";
 import { SET_USER, SET_THEME } from "../../redux/actions";
-import SignupForm from "./signupForm";
-import Modal from "../modal";
-import { logo, motto } from "./paths";
+import { logo } from "./paths";
 // import { Row, Col } from "../styles/common";
 import { Row, Col } from "antd";
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
 const SignIn = (props) => {
+
+  const isMetaMaskInstalled = () => {
+    //Have to check the ethereum binding on the window object to see if it's installed
+    const { ethereum } = window;
+    return Boolean(ethereum && ethereum.isMetaMask);
+  };
+
   const [credentialError, setCredentialError] = useState({
     user: null,
     password: null,
-  });
-  const [userError, setUserError] = useState({
-    username: null,
-    email: null,
   });
   const [loginDisabled, setLoginDisabled] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,78 +45,24 @@ const SignIn = (props) => {
     }
   };
 
-  const handleSignupSubmit = async (data) => {
+  const onClickConnect = async () => {
     try {
-      setLoginDisabled(true);
-      const signup = await axios.post(`${URL}/user/add-user`, {
-        firstname: data.firstname,
-        lastname: data.lastname,
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        dob: data.dob,
-      });
-      setUserError({ username: null, email: null });
-      setLoginDisabled(false);
-      dispatch({ type: SET_USER, payload: signup.data.user });
+      // Will open the MetaMask UI
+      // You should disable this button while the request is pending!
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      dispatch({ type: SET_USER, payload: {account: accounts[0]} });
+      dispatch({ type: SET_THEME, payload: "default" });
       history.push("/home");
-    } catch (err) {
-      setUserError(err.response.data.errors);
-      setLoginDisabled(false);
+      // Move to profile or feed page.
+    } catch (error) {
+      console.error(error);
     }
-  };
+  }
 
   return (
     <React.Fragment>
-      {isModalOpen && (
-        <Modal
-          children={
-            <SignupForm
-              onSubmit={handleSignupSubmit}
-              userError={userError}
-              loginDisabled={loginDisabled}
-            />
-          }
-          handleClose={() => setIsModalOpen(!isModalOpen)}
-          padding="15px"
-        />
-      )}
       <Row>
-        <Col
-          md={12}
-          xs={24}
-          style={{ overflow: "hidden", position: "relative" }}
-        >
-          <LogoWrapper>
-            <Icon d={logo} height="130vh" fill="rgb(29,161,242)" />
-            <div
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                transform: "translate(-50%,-50%)",
-              }}
-            >
-              {motto.map((item) => (
-                <Motto key={item.text}>
-                  <Icon
-                    d={item.path}
-                    width="28.75px"
-                    height="28.75px"
-                    fill="rgb(255,255,255)"
-                  />
-                  <span>{item.text}</span>
-                </Motto>
-              ))}
-            </div>
-          </LogoWrapper>
-        </Col>
         <Col md={12} xs={24} style={{ padding: "15px" }}>
-          <LoginForm
-            onSubmit={handleSubmit}
-            credentialError={credentialError}
-            loginDisabled={loginDisabled}
-          />
           <Flex>
             <div>
               <Icon
@@ -125,15 +71,15 @@ const SignIn = (props) => {
                 height="41.25px"
                 fill="rgb(29,161,242)"
               />
-              <h1>See what's happening in the world right now</h1>
-              <p>Join twitter today.</p>
+              <h1>Not your rules, not your profile</h1>
+              <p>Join the revolution.</p>
               <Button
                 bg="rgb(29,160,240)"
                 color="rgb(255,255,255)"
                 hovbg="rgb(26, 146, 220)"
-                onClick={() => setIsModalOpen(!isModalOpen)}
+                onClick={onClickConnect}
               >
-                Sign up
+                Connect
               </Button>
             </div>
           </Flex>

@@ -1,27 +1,11 @@
 import styled from "styled-components";
 
-export const LogoWrapper = styled.div`
-  background: rgb(113, 201, 248);
-  height: 100vh;
-  overflow: hidden;
-`;
-
-export const Motto = styled.div`
-  margin-bottom: 40px;
-  span {
-    color: rgb(255, 255, 255);
-    font-size: 19px;
-    font-weight: bold;
-    margin-left: 15px;
-  }
-`;
-
 export const Button = styled.button`
   width: 100%;
   background: ${(props) => props.bg};
   color: ${(props) => props.color};
   border: 1px solid rgb(29, 161, 242);
-  border-radius: 50px;
+  border-radius: 3px;
   font-size: 15px;
   font-weight: bold;
   padding: 5px 10px;

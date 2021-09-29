@@ -1,40 +1,24 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
 import { toast } from "react-toastify";
 import UploadButton from "../uploadButton";
 import { Flex, Button } from "../styles/modal";
 import { SET_UPDATE } from "../../redux/actions";
-
-const URL = process.env.REACT_APP_SERVER_URL;
+import { ethers } from "ethers";
+import socialContractAbi from "../../abi/Social.json";
+import { socialAddress } from "../../contracts";
 
 const TweetModal = (props) => {
   const [text, setText] = useState("");
   const [isTweetDisabled, setIsTweetDisabled] = useState(true);
+  const [rulesID, setRulesID] = useState(0);
   const [preview, setPreview] = useState({ image: "", video: "", media: null });
 
-  const user = useSelector((state) => state.profile.user);
+  const account = useSelector((state) => state.profile.user.account);
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
   const { handleClose, rows } = props;
-
-  const addTweet = async () => {
-    setIsTweetDisabled(true);
-    const data = new FormData();
-    data.append("userId", user.id);
-    data.append("text", text);
-    if (preview.media) data.append("media", preview.media);
-    if (preview.image || preview.video)
-      data.append("resource_type", preview.image ? "image" : "video");
-    const res = await axios.post(`${URL}/tweet/add-tweet`, data);
-    setIsTweetDisabled(false);
-    setText("");
-    setPreview({ image: "", video: "", media: null });
-    toast("Your tweet was sent");
-    dispatch({ type: SET_UPDATE });
-    handleClose && handleClose();
-  };
 
   const handlePhoto = (e) => {
     const file = e.target.files[0];
@@ -54,7 +38,7 @@ const TweetModal = (props) => {
       <Flex bg={theme.bg} color={theme.color}>
         <div>
           <img
-            src={user.avatar}
+            src={null}
             width="49px"
             height="49px"
             style={{ borderRadius: "50%" }}
@@ -100,12 +84,25 @@ const TweetModal = (props) => {
             </div>
             <div>
               <Button
-                onClick={addTweet}
+                onClick={async () => {
+                  setIsTweetDisabled(true);
+                  // preview.media preview.video preview.image
+                  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+                  const social = new ethers.Contract(socialAddress, socialContractAbi, signer);
+                  await social.post(text, rulesID);
+
+                  setIsTweetDisabled(false);
+                  setText("");
+                  setPreview({ image: "", video: "", media: null });
+                  toast("Your message was sent");
+                  dispatch({ type: SET_UPDATE });
+                  handleClose && handleClose();
+                }}
                 disabled={isTweetDisabled}
                 defaultBg={theme.defaultBg}
                 darkBg={theme.darkBg}
               >
-                Tweet
+                Post
               </Button>
             </div>
           </Flex>
