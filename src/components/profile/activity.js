@@ -17,6 +17,8 @@ import Loading from "../loading";
 import Bookmark from "./bookmark";
 import Modal from "../modal";
 import CommentModal from "../tweet/commentModal";
+const { GraphQLClient, gql } = require('graphql-request');
+const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -27,8 +29,7 @@ const Activity = (props) => {
 
   const { username } = useParams();
   const user = useSelector((state) => state.profile.user);
-  const myId = user.id;
-  const token = user.token;
+  const myId = user.account;
   const refresh = useSelector((state) => state.update.refresh);
   const theme = useSelector((state) => state.theme);
 
@@ -44,40 +45,49 @@ const Activity = (props) => {
 
   useEffect(() => {
     // ComponentDidMount
-    const cancelToken = axios.CancelToken;
-    const source = cancelToken.source();
-    getData(source);
-    return () => {
-      source.cancel();
-    };
+    getData();
   }, [url, refresh]);
 
-  const getData = async (source) => {
+  const getData = async () => {
     try {
-      const res = await axios.get(url, {
-        cancelToken: source.token,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setTweets(res.data.tweets);
+      const { posts } = await graph.request(
+        gql`
+          query postsQuery {
+            posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 1000) {
+              id
+              message
+              creationTime
+              disputed
+              totalComments
+              author {
+                id
+              }
+              comments {
+                id
+              }
+            }
+          }
+        `
+      );
+      console.log(posts);
+      setTweets(posts);
       handleHeaderText &&
-        handleHeaderText(`${res.data.tweets.length} ${header}`);
+        handleHeaderText(`${posts.length} ${header}`);
     } catch (err) {
       console.log(err);
     }
   };
 
   const updateDetails = (idx, newState) => {
-    setTweets([
-      ...tweets.slice(0, idx),
-      {
-        ...tweets[idx],
-        [newState[0][0]]: newState[0][1],
-        [newState[1][0]]: newState[1][1],
-      },
-      ...tweets.slice(idx + 1),
-    ]);
+    // setTweets([
+    //   ...tweets.slice(0, idx),
+    //   {
+    //     ...tweets[idx],
+    //     [newState[0][0]]: newState[0][1],
+    //     [newState[1][0]]: newState[1][1],
+    //   },
+    //   ...tweets.slice(idx + 1),
+    // ]);
   };
 
   const handleClose = () => {
@@ -120,20 +130,20 @@ const Activity = (props) => {
         return (
           <React.Fragment>
             <Link
-              key={tweet["Tweets.id"]}
-              to={`/${tweet.username}/status/${tweet["Tweets.id"]}`}
+              key={tweet.id}
+              to={`/${tweet.author.id}/status/${tweet.id}`}
             >
               <PeopleFlex hover border={theme.border} tweetHov={theme.tweetHov}>
                 <User>
-                  <UserImage src={tweet.avatar} />
+                  <UserImage src={tweet.author.id} />
                 </User>
                 <div style={{ width: "80%" }}>
                   <TweetDetails color={theme.color}>
                     {/* <object> to hide nested <a> warning */}
                     <object>
-                      <Link to={`/profile/${tweet.username}`}>
+                      <Link to={`/profile/${tweet.author.id}`}>
                         <h3>
-                          {tweet.firstname} {tweet.lastname}
+                          {tweet.author.id}
                         </h3>
                       </Link>
                     </object>
@@ -145,7 +155,7 @@ const Activity = (props) => {
                         maxWidth: "18%",
                       }}
                     >
-                      @{tweet.username}
+                      @{tweet.author.id}
                     </p>
                     <span>
                       {date.toLocaleString("default", { month: "short" })}{" "}
@@ -155,7 +165,7 @@ const Activity = (props) => {
                     </span>
                   </TweetDetails>
                   <div style={{ color: theme.color }}>
-                    {tweet["Tweets.text"]}
+                    {tweet.message}
                   </div>
                   {tweet["Tweets.media"] && isImage(tweet["Tweets.media"]) && (
                     <img
@@ -179,7 +189,8 @@ const Activity = (props) => {
                       getData={getData}
                       onClick={(e) => {
                         e.preventDefault();
-                        setTweetId(tweet["Tweets.id"]);
+                        setTweetId(tweet.id);
+                        console.log(tweet.id);
                         setIsModalOpen(true);
                       }}
                     />

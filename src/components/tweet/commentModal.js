@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
 import UploadButton from "../uploadButton";
 import { Flex, Button } from "../styles/modal";
 import { SET_UPDATE } from "../../redux/actions";
+import { ethers } from "ethers";
+import { toast } from "react-toastify";
+import socialContractAbi from "../../abi/Social.json";
+import { socialAddress } from "../../contracts";
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -20,17 +23,14 @@ const CommentModal = (props) => {
 
   const addComment = async () => {
     setIsCommentDisabled(true);
-    const data = new FormData();
-    data.append("tweetId", tweetId);
-    data.append("userId", user.id);
-    data.append("text", text);
-    if (preview.media) data.append("media", preview.media);
-    if (preview.image || preview.video)
-      data.append("resource_type", preview.image ? "image" : "video");
-    const res = await axios.post(`${URL}/tweet/comment/add`, data);
+    // preview.media preview.video preview.image
+    const social = new ethers.Contract(socialAddress, socialContractAbi, user.signer);
+    await social.commentPost(tweetId, text);
+
     setIsCommentDisabled(false);
     setText("");
     setPreview({ image: "", video: "", media: null });
+    toast("Reply sent!");
     dispatch({ type: SET_UPDATE });
     handleClose && handleClose();
   };

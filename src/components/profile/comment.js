@@ -23,7 +23,7 @@ const Comment = (props) => {
           fill="rgb(101, 119, 134)"
         />
       </ActivityIcon>
-      <Text color="rgb(101, 119, 134)">{tweet["Tweets.commentsCount"]}</Text>
+      <Text color="rgb(101, 119, 134)">{tweet.totalComments}</Text>
     </ActivityBox>
   );
 };

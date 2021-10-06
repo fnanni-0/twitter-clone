@@ -5,6 +5,8 @@ import axios from "axios";
 import { SideBarBox, Header, Users, UserFlex, Button } from "../styles/sidebar";
 import Loading from "../loading";
 import { SET_UPDATE } from "../../redux/actions";
+const { GraphQLClient, gql } = require('graphql-request');
+const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -14,30 +16,36 @@ const SideBar = () => {
 
   const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
-  const userId = user.id;
-  const token = user.token;
+  const userId = user.account;
   const refresh = useSelector((state) => state.update.refresh);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const cancelToken = axios.CancelToken;
-    const source = cancelToken.source();
     (async () => {
       try {
-        const res = await axios.get(`${URL}/feed/who-follow?userId=${userId}`, {
-          cancelToken: source.token,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setWhoFollow(res.data.whoFollow);
+        const { profiles } = await graph.request(
+          gql`
+            query followingQuery($address: String) {
+              profiles(where: {id: $address}, first: 1000) {
+                following {
+                  id
+                }
+                totalFollowers
+              }
+            }
+          `,
+          {
+            address: user.account,
+          }
+        );
+        console.log(profiles[0].following);
+        setWhoFollow(profiles[0].following);
+        handleHeaderText &&
+          handleHeaderText(`${posts.length} ${header}`);
       } catch (err) {
         console.log(err);
       }
     })();
-    return () => {
-      source.cancel();
-    };
   }, [refresh]);
 
   const handleFollow = async (e, idx) => {

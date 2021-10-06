@@ -19,6 +19,8 @@ import Modal from "../modal";
 import CommentModal from "./commentModal";
 import Comments from "./comments";
 import TweetActivity from "./activity";
+const { GraphQLClient, gql } = require('graphql-request');
+const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -29,12 +31,14 @@ const Tweet = (props) => {
 
   const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
-  const myId = user.id;
-  const token = user.token;
+  const myId = user.account;
 
   const location = useLocation();
 
   useEffect(() => {
+
+    // Fetch post data
+    
     (async () => {
       const res = await axios.get(
         `${URL}/tweet/get-tweet?username=${username}&tweetId=${tweetId}&myId=${myId}`
