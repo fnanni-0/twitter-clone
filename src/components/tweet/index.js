@@ -19,6 +19,7 @@ import Modal from "../modal";
 import CommentModal from "./commentModal";
 import Comments from "./comments";
 import TweetActivity from "./activity";
+import makeBlockie from 'ethereum-blockies-base64';
 const { GraphQLClient, gql } = require('graphql-request');
 const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
@@ -28,6 +29,9 @@ const Tweet = (props) => {
   const [tweet, setTweet] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { username, tweetId } = useParams();
+  console.log("Tweet");
+  console.log(username);
+  console.log(tweetId);
 
   const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
@@ -36,14 +40,42 @@ const Tweet = (props) => {
   const location = useLocation();
 
   useEffect(() => {
-
-    // Fetch post data
-    
     (async () => {
-      const res = await axios.get(
-        `${URL}/tweet/get-tweet?username=${username}&tweetId=${tweetId}&myId=${myId}`
-      );
-      setTweet(res.data.tweet);
+      try {
+        const { post } = await graph.request(
+          gql`
+            query postQuery($postID: String) {
+              post(id: $postID) {
+                id
+                message
+                creationTime
+                disputed
+                totalComments
+                author {
+                  id
+                }
+                comments(orderBy: id, orderDirection: desc, first: 100) {
+                  id
+                  message
+                  creationTime
+                  disputed
+                  totalComments
+                  author {
+                    id
+                  }
+                }
+              }
+            }
+          `,
+          {
+            postID: tweetId
+          }
+        );
+        console.log(post);
+        setTweet(post);
+      } catch (err) {
+        console.log(err);
+      }
     })();
   }, []);
 
@@ -110,7 +142,12 @@ const Tweet = (props) => {
     "M12 21.638h-.014C9.403 21.59 1.95 14.856 1.95 8.478c0-3.064 2.525-5.754 5.403-5.754 2.29 0 3.83 1.58 4.646 2.73.814-1.148 2.354-2.73 4.645-2.73 2.88 0 5.404 2.69 5.404 5.755 0 6.376-7.454 13.11-10.037 13.157H12z",
   ];
 
-  const date = new Date(tweet["Tweets.createdAt"]);
+  const selfLiked = false;
+  const selfRetweeted = false;
+  const retweets = 0;
+  const likes = 0;
+
+  const date = new Date(tweet.creationTime * 1000);
   return (
     <ProfileCorner border={theme.border}>
       {isModalOpen && (
@@ -127,19 +164,19 @@ const Tweet = (props) => {
         <div style={{ padding: "10px 15px 0px 15px" }}>
           <Flex>
             <div>
-              <UserImage src={tweet.avatar} />
+              <UserImage src={makeBlockie(tweet.author.id)} />
             </div>
             <div>
-              <Link to={`/profile/${tweet.username}`}>
+              <Link to={`/profile/${tweet.author.id}`}>
                 <h3 style={{ color: theme.color }}>
-                  {tweet.firstname} {tweet.lastname}
+                  {tweet.author.id}
                 </h3>
-                <p>@{tweet.username}</p>
+                <p>@{tweet.author.id}</p>
               </Link>
             </div>
           </Flex>
           <TweetText>
-            <p style={{ color: theme.color }}>{tweet["Tweets.text"]}</p>
+            <p style={{ color: theme.color }}>{tweet.message}</p>
             {tweet["Tweets.media"] && isImage(tweet["Tweets.media"]) && (
               <img src={tweet["Tweets.media"]} style={{ width: "100%" }} />
             )}
@@ -162,10 +199,10 @@ const Tweet = (props) => {
           </TweetText>
           <ActivityInfo color={theme.color}>
             <Link to={`${location.pathname}/retweets`} replace>
-              <h4>{tweet["Tweets.retweetsCount"]}</h4> <span>Retweets</span>
+              <h4>{retweets}</h4> <span>Retweets</span>
             </Link>
             <Link to={`${location.pathname}/likes`} replace>
-              <h4>{tweet["Tweets.likesCount"]}</h4> <span>Likes</span>
+              <h4>{likes}</h4> <span>Likes</span>
             </Link>
           </ActivityInfo>
           <Activity>
@@ -193,17 +230,18 @@ const Tweet = (props) => {
             <div>
               <TweetActivity
                 handleClick={() =>
-                  handleActivity(
-                    "selfRetweeted",
-                    "Tweets.retweetsCount",
-                    "retweet"
-                  )
+                  // handleActivity(
+                  //   "selfRetweeted",
+                  //   "Tweets.retweetsCount",
+                  //   "retweet"
+                  // )
+                  console.log("Not implemented")
                 }
                 hoverColor="rgb(23,191,99)"
                 hoverBg="rgba(23,191,99,0.1)"
                 path={retweetPath}
                 fill={
-                  tweet.selfRetweeted
+                  selfRetweeted
                     ? "rgb(23, 191, 99)"
                     : "rgb(101, 119, 134)"
                 }
@@ -213,13 +251,14 @@ const Tweet = (props) => {
             <div>
               <TweetActivity
                 handleClick={() =>
-                  handleActivity("selfLiked", "Tweets.likesCount", "like")
+                  // handleActivity("selfLiked", "Tweets.likesCount", "like")
+                  console.log("Not implemented")
                 }
                 hoverColor="rgb(224,36,94)"
                 hoverBg="rgba(224,36,94,0.1)"
                 path={likePath}
                 fill={
-                  tweet.selfLiked ? "rgb(224, 36, 94)" : "rgb(101, 119, 134)"
+                  selfLiked ? "rgb(224, 36, 94)" : "rgb(101, 119, 134)"
                 }
                 noPadding={true}
               />
@@ -227,7 +266,7 @@ const Tweet = (props) => {
           </Activity>
         </div>
       </TweetWrapper>
-      <Comments />
+      <Comments comments={tweet.comments}/>
     </ProfileCorner>
   );
 };

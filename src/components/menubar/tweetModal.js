@@ -7,6 +7,7 @@ import { SET_UPDATE } from "../../redux/actions";
 import { ethers } from "ethers";
 import socialContractAbi from "../../abi/Social.json";
 import { socialAddress } from "../../contracts";
+import makeBlockie from 'ethereum-blockies-base64';
 
 const TweetModal = (props) => {
   const [text, setText] = useState("");
@@ -38,7 +39,7 @@ const TweetModal = (props) => {
       <Flex bg={theme.bg} color={theme.color}>
         <div>
           <img
-            src={null}
+            src={makeBlockie(user.account)}
             width="49px"
             height="49px"
             style={{ borderRadius: "50%" }}

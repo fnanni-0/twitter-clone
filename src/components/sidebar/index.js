@@ -22,6 +22,7 @@ const SideBar = () => {
 
   useEffect(() => {
     (async () => {
+      console.log(user.account);
       try {
         const { profiles } = await graph.request(
           gql`
@@ -40,8 +41,6 @@ const SideBar = () => {
         );
         console.log(profiles[0].following);
         setWhoFollow(profiles[0].following);
-        handleHeaderText &&
-          handleHeaderText(`${posts.length} ${header}`);
       } catch (err) {
         console.log(err);
       }

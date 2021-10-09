@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Like from "./like";
@@ -17,6 +16,7 @@ import Loading from "../loading";
 import Bookmark from "./bookmark";
 import Modal from "../modal";
 import CommentModal from "../tweet/commentModal";
+import makeBlockie from 'ethereum-blockies-base64';
 const { GraphQLClient, gql } = require('graphql-request');
 const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
@@ -126,7 +126,7 @@ const Activity = (props) => {
         />
       )}
       {tweets.map((tweet, idx) => {
-        const date = new Date(tweet["Tweets.createdAt"]);
+        const date = new Date(tweet.creationTime * 1000);
         return (
           <React.Fragment>
             <Link
@@ -135,7 +135,7 @@ const Activity = (props) => {
             >
               <PeopleFlex hover border={theme.border} tweetHov={theme.tweetHov}>
                 <User>
-                  <UserImage src={tweet.author.id} />
+                  <UserImage src={makeBlockie(tweet.author.id)}/>
                 </User>
                 <div style={{ width: "80%" }}>
                   <TweetDetails color={theme.color}>

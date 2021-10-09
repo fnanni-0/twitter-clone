@@ -1,62 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Loading from "../loading";
 import { PeopleFlex, UserImage, TweetDetails } from "../styles/profile";
 import { isImage, isVideo } from "../../media";
-const { GraphQLClient, gql } = require('graphql-request');
-const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
+import makeBlockie from 'ethereum-blockies-base64';
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
-const Comments = () => {
-  const [comments, setComments] = useState(null);
-  const { tweetId } = useParams();
-  const refresh = useSelector((state) => state.update.refresh);
+const Comments = (props) => {
   const theme = useSelector((state) => state.theme);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const { postComments } = await graph.request(
-          gql`
-            query postsQuery($rootPostID: String) {
-              posts(where: {groupID: $rootPostID}, orderBy: id, orderDirection: desc, first: 1000) {
-                id
-                message
-                creationTime
-                disputed
-                totalComments
-                author {
-                  id
-                }
-                comments {
-                  id
-                }
-              }
-            }
-          `,
-          {
-            rootPostID: tweetId
-          }
-        );
-        console.log(postComments);
-        setComments(postComments);
-      } catch (err) {
-        console.log(err);
-      }
-    })();
-  }, [refresh]);
-
-  if (!comments) return <Loading />;
   return (
     <div>
-      {comments.map((comment) => {
-        const date = new Date(comment.creationTime);
+      {props.comments.map((comment) => {
+        const date = new Date(comment.creationTime * 1000);
         return (
           <PeopleFlex hover key={comment.id} border={theme.border}>
             <div>
-              <UserImage src={comment.id} />
+              <UserImage src={makeBlockie(comment.author.id)} />
             </div>
             <div style={{ width: "100%" }}>
               <TweetDetails color={theme.color}>
