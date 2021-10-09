@@ -13,6 +13,8 @@ import {
 import { ProfileCorner, Button } from "../styles/common";
 import Loading from "../loading";
 import { SET_UPDATE } from "../../redux/actions";
+const { GraphQLClient, gql } = require('graphql-request');
+const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -25,27 +27,45 @@ const Follow = () => {
   const refresh = useSelector((state) => state.update.refresh);
   const theme = useSelector((state) => state.theme);
   const myId = user.id;
-  const token = user.token;
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // ComponentDidMount
     (async () => {
-      const user = await axios.get(`${URL}/user/get-user?username=${username}`);
-      const res = await axios.get(
-        `${URL}/follow/details?id=${user.data.id}&myId=${myId}`
-      );
-      setUserData({
-        user: user.data,
-        following: res.data.following.map((item) => ({
-          ...item,
-          unfollow: false,
-        })),
-        followers: res.data.followers.map((item) => ({
-          ...item,
-          unfollow: false,
-        })),
-      });
+      try {
+        const { profile } = await graph.request(
+          gql`
+            query profileQuery($account: String) {
+              profile(id: $account) {
+                id
+                followers(first: 10) {
+                  id
+                }
+                following(first: 10) {
+                  id
+                }
+                totalFollowers
+                totalFollowing
+              }
+            }
+          `,
+          {
+            account: username
+          }
+        );
+        setUserData({
+          user: profile,
+          following: profile.following.map((item) => ({
+            ...item,
+            unfollow: false,
+          })),
+          followers: profile.followers.map((item) => ({
+            ...item,
+            unfollow: false,
+          })),
+        });
+      } catch (err) {
+        console.log(err);
+      }
     })();
   }, []);
 
@@ -112,8 +132,8 @@ const Follow = () => {
   return (
     <ProfileCorner border={theme.border}>
       <ProfileHeader
-        heading={`${userData.user.firstname} ${userData.user.lastname}`}
-        text={`@${userData.user.username}`}
+        heading={`${userData.user.id}`}
+        text={`@${userData.user.id}`}
       />
       <Tabs tabList={tabList} />
       {!userData[activity].length ? (

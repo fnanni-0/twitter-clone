@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { FollowFlex } from "../styles/profile";
 import theme from "../../redux/reducers/theme";
 
@@ -13,18 +12,16 @@ const Follower = (props) => {
   const { user } = props;
 
   const { username } = useParams();
-  const myId = useSelector((state) => state.profile.user.id);
   const theme = useSelector((state) => state.theme);
+
+  if (user === undefined) return <React.Fragment></React.Fragment>;
 
   useEffect(() => {
     // ComponentDidMount
     (async () => {
-      const res = await axios.get(
-        `${URL}/follow/details?id=${user.id}&myId=${myId}`
-      );
       setResponse({
-        followers: res.data.followers,
-        following: res.data.following,
+        followers: user.followers,
+        following: user.following,
       });
     })();
   }, [user]);

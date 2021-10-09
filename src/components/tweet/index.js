@@ -29,9 +29,6 @@ const Tweet = (props) => {
   const [tweet, setTweet] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { username, tweetId } = useParams();
-  console.log("Tweet");
-  console.log(username);
-  console.log(tweetId);
 
   const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
@@ -71,7 +68,6 @@ const Tweet = (props) => {
             postID: tweetId
           }
         );
-        console.log(post);
         setTweet(post);
       } catch (err) {
         console.log(err);

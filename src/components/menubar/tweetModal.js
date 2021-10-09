@@ -94,7 +94,7 @@ const TweetModal = (props) => {
                   setIsTweetDisabled(false);
                   setText("");
                   setPreview({ image: "", video: "", media: null });
-                  toast("Your message was sent");
+                  toast("Your post was submitted");
                   dispatch({ type: SET_UPDATE });
                   handleClose && handleClose();
                 }}

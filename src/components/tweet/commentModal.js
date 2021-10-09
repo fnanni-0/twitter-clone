@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import socialContractAbi from "../../abi/Social.json";
 import { socialAddress } from "../../contracts";
+import makeBlockie from 'ethereum-blockies-base64';
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -25,12 +26,13 @@ const CommentModal = (props) => {
     setIsCommentDisabled(true);
     // preview.media preview.video preview.image
     const social = new ethers.Contract(socialAddress, socialContractAbi, user.signer);
+    // Send along value, checking deposit with arbitrator.
     await social.commentPost(tweetId, text);
 
     setIsCommentDisabled(false);
     setText("");
     setPreview({ image: "", video: "", media: null });
-    toast("Reply sent!");
+    toast("Reply submitted!");
     dispatch({ type: SET_UPDATE });
     handleClose && handleClose();
   };
@@ -52,7 +54,7 @@ const CommentModal = (props) => {
     <Flex bg={theme.bg} color={theme.color}>
       <div>
         <img
-          src={user.avatar}
+          src={makeBlockie(user.account)}
           width="49px"
           height="49px"
           style={{ borderRadius: "50%" }}

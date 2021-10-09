@@ -15,6 +15,9 @@ import { ProfileCorner } from "../styles/common";
 import Loading from "../loading";
 import { toast } from "react-toastify";
 import { SET_USER, SET_UPDATE } from "../../redux/actions";
+import makeBlockie from 'ethereum-blockies-base64';
+const { GraphQLClient, gql } = require('graphql-request');
+const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
 const URL = process.env.REACT_APP_SERVER_URL;
 
@@ -29,13 +32,35 @@ const Profile = (props) => {
   const refresh = useSelector((state) => state.update.refresh);
   const theme = useSelector((state) => state.theme);
   const myId = storeUser.id;
-  const token = storeUser.token;
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
-      const res = await axios.get(`${URL}/user/get-user?username=${username}`);
-      setUser(res.data);
+      try {
+        const { profile } = await graph.request(
+          gql`
+            query profileQuery($account: String) {
+              profile(id: $account) {
+                id
+                followers(first: 10) {
+                  id
+                }
+                following(first: 10) {
+                  id
+                }
+                totalFollowers
+                totalFollowing
+              }
+            }
+          `,
+          {
+            account: username
+          }
+        );
+        setUser(profile);
+      } catch (err) {
+        console.log(err);
+      }
     })();
   }, [username, refresh]);
 
@@ -78,10 +103,11 @@ const Profile = (props) => {
     dispatch({ type: SET_UPDATE });
   };
 
-  if (user === null) return <Loading />;
+  if (user == null) return <Loading />;
+  console.log(user);
 
-  const dob = new Date(user.dob);
-  const joinedAt = new Date(user.createdAt);
+  const dob = new Date(null);
+  const joinedAt = new Date(null);
   const dobPath = [
     "M7.75 11.083c-.414 0-.75-.336-.75-.75C7 7.393 9.243 5 12 5c.414 0 .75.336.75.75s-.336.75-.75.75c-1.93 0-3.5 1.72-3.5 3.833 0 .414-.336.75-.75.75z",
     "M20.75 10.333c0-5.01-3.925-9.083-8.75-9.083s-8.75 4.074-8.75 9.083c0 4.605 3.32 8.412 7.605 8.997l-1.7 1.83c-.137.145-.173.357-.093.54.08.182.26.3.46.3h4.957c.198 0 .378-.118.457-.3.08-.183.044-.395-.092-.54l-1.7-1.83c4.285-.585 7.605-4.392 7.605-8.997zM12 17.917c-3.998 0-7.25-3.402-7.25-7.584S8.002 2.75 12 2.75s7.25 3.4 7.25 7.583-3.252 7.584-7.25 7.584z",
@@ -152,6 +178,8 @@ const Profile = (props) => {
     }
   };
 
+
+
   return (
     <React.Fragment>
       {isModalOpen && (
@@ -170,19 +198,19 @@ const Profile = (props) => {
       )}
       <ProfileCorner border={theme.border}>
         <ProfileHeader
-          heading={`${user.firstname} ${user.lastname}`}
+          heading={`${user.id}`}
           text={headerText}
         />
         <div>
           <Cover
             bg={theme.border}
             style={{
-              backgroundImage: `url(${user.cover})`,
+              backgroundImage: `url(${null})`,
               backgroundSize: "cover",
             }}
           ></Cover>
           <ImgFlex>
-            <Avatar backgroundImage={user.avatar} bg={theme.bg} />
+            <Avatar backgroundImage={makeBlockie(user.id)} bg={theme.bg} />
             {storeUser.id === user.id && (
               <Button bg={theme.bg} onClick={() => setIsModalOpen(true)}>
                 Edit profile
@@ -192,12 +220,12 @@ const Profile = (props) => {
         </div>
         <Info color={theme.color}>
           <h2>
-            {user.firstname} {user.lastname}
+            {user.id}
           </h2>
-          <p>@{user.username}</p>
-          {user.bio && <p>{user.bio}</p>}
+          <p>@{user.id}</p>
+          {user.id && <p>{user.id}</p>}
           <Dates>
-            {user.location && (
+            {user.id && (
               <div>
                 <Icon
                   d={locationPath}
@@ -205,7 +233,7 @@ const Profile = (props) => {
                   height="18.75px"
                   fill="rgb(101,119,134)"
                 />
-                <span>{user.location}</span>
+                <span>{user.id}</span>
               </div>
             )}
             <div>

@@ -50,26 +50,52 @@ const Activity = (props) => {
 
   const getData = async () => {
     try {
-      const { posts } = await graph.request(
-        gql`
-          query postsQuery {
-            posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 1000) {
-              id
-              message
-              creationTime
-              disputed
-              totalComments
-              author {
-                id
-              }
-              comments {
-                id
+      let posts;
+      if (username) {
+        const query = await graph.request(
+          gql`
+            query postsQuery($account: String) {
+              profile(id: $account) {
+                posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 100) {
+                  id
+                  message
+                  creationTime
+                  disputed
+                  totalComments
+                  author {
+                    id
+                  }
+                }
               }
             }
+          `,
+          {
+            account: username
           }
-        `
-      );
-      console.log(posts);
+        );
+        posts = query.profile.posts;
+      } else {
+        const query = await graph.request(
+          gql`
+            query postsQuery {
+              posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 1000) {
+                id
+                message
+                creationTime
+                disputed
+                totalComments
+                author {
+                  id
+                }
+                comments {
+                  id
+                }
+              }
+            }
+          `
+        );
+        posts = query.posts;
+      }
       setTweets(posts);
       handleHeaderText &&
         handleHeaderText(`${posts.length} ${header}`);
@@ -128,7 +154,7 @@ const Activity = (props) => {
       {tweets.map((tweet, idx) => {
         const date = new Date(tweet.creationTime * 1000);
         return (
-          <React.Fragment>
+          <React.Fragment key={tweet.id}>
             <Link
               key={tweet.id}
               to={`/${tweet.author.id}/status/${tweet.id}`}

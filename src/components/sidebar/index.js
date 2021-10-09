@@ -5,6 +5,7 @@ import axios from "axios";
 import { SideBarBox, Header, Users, UserFlex, Button } from "../styles/sidebar";
 import Loading from "../loading";
 import { SET_UPDATE } from "../../redux/actions";
+import makeBlockie from 'ethereum-blockies-base64';
 const { GraphQLClient, gql } = require('graphql-request');
 const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
 
@@ -16,31 +17,23 @@ const SideBar = () => {
 
   const user = useSelector((state) => state.profile.user);
   const theme = useSelector((state) => state.theme);
-  const userId = user.account;
   const refresh = useSelector((state) => state.update.refresh);
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
-      console.log(user.account);
       try {
         const { profiles } = await graph.request(
           gql`
-            query followingQuery($address: String) {
-              profiles(where: {id: $address}, first: 1000) {
-                following {
-                  id
-                }
-                totalFollowers
+            query followingQuery {
+              profiles(orderBy: totalFollowers, orderDirection: desc, first: 10) {
+                id
               }
             }
-          `,
-          {
-            address: user.account,
-          }
+          `
         );
-        console.log(profiles[0].following);
-        setWhoFollow(profiles[0].following);
+        setWhoFollow(profiles.filter((profile) => profile.id != user.account));
+        // TODO: show profiles relevant to the context.
       } catch (err) {
         console.log(err);
       }
@@ -54,7 +47,7 @@ const SideBar = () => {
       `${URL}/follow`,
       {
         followedId: whoFollow[idx].id,
-        followerId: userId,
+        followerId: user.account,
       },
       {
         headers: {
@@ -62,7 +55,7 @@ const SideBar = () => {
         },
       }
     );
-    const res = await axios.get(`${URL}/feed/who-follow?userId=${userId}`, {
+    const res = await axios.get(`${URL}/feed/who-follow?userId=${user.account}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -86,14 +79,14 @@ const SideBar = () => {
           </p>
         )}
         {whoFollow.map((user, idx) => (
-          <Link to={`/profile/${user.username}`} key={user.id}>
+          <Link to={`/profile/${user.id}`} key={user.id}>
             <UserFlex color={theme.color} border={theme.border}>
-              <img src={user.avatar} />
+              <img src={makeBlockie(user.id)} />
               <div>
                 <h3>
-                  {user.firstname} {user.lastname}
+                  {user.id.substring(0, 10) + "..."}
                 </h3>
-                <p>@{user.username}</p>
+                <p>@{user.id.substring(0, 10) + "..."}</p>
               </div>
               <div style={{ marginLeft: "auto" }}>
                 <Button
