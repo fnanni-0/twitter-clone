@@ -40,7 +40,6 @@ const SideBar = () => {
             userAccount: user.account
           }
         );
-        // TODO: compute isFollowing info.
         setWhoFollow(profiles);
         // TODO: show profiles relevant to the context.
       } catch (err) {

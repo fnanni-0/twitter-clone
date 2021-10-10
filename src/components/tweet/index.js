@@ -51,6 +51,11 @@ const Tweet = (props) => {
                 author {
                   id
                 }
+                threadMainPost {
+                  author {
+                    id
+                  }
+                }
                 comments(orderBy: id, orderDirection: asc, first: 100) {
                   id
                   message
@@ -149,7 +154,7 @@ const Tweet = (props) => {
       {isModalOpen && (
         <Modal
           children={
-            <CommentModal handleClose={handleClose} tweetId={tweetId} />
+            <CommentModal handleClose={handleClose} tweetId={tweetId} threadAuthor={tweet.threadMainPost.author.id}/>
           }
           handleClose={handleClose}
           padding="15px"

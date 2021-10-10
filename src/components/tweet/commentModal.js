@@ -6,7 +6,9 @@ import { SET_UPDATE } from "../../redux/actions";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import socialContractAbi from "../../abi/Social.json";
-import { socialAddress } from "../../contracts";
+import arbitratorContractAbi from "../../abi/Arbitrator.json";
+import POHContractAbi from "../../abi/ProofOfHumanity.json";
+import { socialAddress, arbitratorAddress, POHAddress } from "../../contracts";
 import makeBlockie from 'ethereum-blockies-base64';
 
 const URL = process.env.REACT_APP_SERVER_URL;
@@ -20,14 +22,35 @@ const CommentModal = (props) => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
-  const { handleClose, rows, tweetId } = props;
+  const { handleClose, rows, tweetId, threadAuthor } = props;
 
   const addComment = async () => {
     setIsCommentDisabled(true);
     // preview.media preview.video preview.image
     const social = new ethers.Contract(socialAddress, socialContractAbi, user.signer);
-    // Send along value, checking deposit with arbitrator.
-    await social.commentPost(tweetId, text);
+    const arbitrator = new ethers.Contract(arbitratorAddress, arbitratorContractAbi, user.signer);
+    const poh = new ethers.Contract(POHAddress, POHContractAbi, user.signer);
+    
+    const isFollower = await social.following(threadAuthor, user.account);
+    if (user.account != threadAuthor && !isFollower) {
+      // Deposit required.
+      const extraData = await social.arbitratorExtraData();
+      const arbitrationCost = await arbitrator.arbitrationCost(extraData);
+      const totalCost = arbitrationCost.mul(3).div(2);
+  
+      let commentDeposit;
+      const isHuman = await poh.isRegistered(user.account);
+      if (isHuman) {
+        commentDeposit = totalCost.div(16);
+      } else {
+        commentDeposit = totalCost.div(2);
+      }
+      await social.commentPost(tweetId, text, {
+        value: commentDeposit
+      });
+    } else {
+      await social.commentPost(tweetId, text);
+    }
 
     setIsCommentDisabled(false);
     setText("");

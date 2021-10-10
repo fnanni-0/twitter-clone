@@ -26,6 +26,7 @@ const Activity = (props) => {
   const [tweets, setTweets] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tweetId, setTweetId] = useState(null);
+  const [threadAuthor, setThreadAuthor] = useState(null);
 
   const { username } = useParams();
   const user = useSelector((state) => state.profile.user);
@@ -65,6 +66,11 @@ const Activity = (props) => {
                   author {
                     id
                   }
+                  threadMainPost {
+                    author {
+                      id
+                    }
+                  }
                 }
               }
             }
@@ -86,6 +92,11 @@ const Activity = (props) => {
                 totalComments
                 author {
                   id
+                }
+                threadMainPost {
+                  author {
+                    id
+                  }
                 }
                 comments {
                   id
@@ -145,7 +156,7 @@ const Activity = (props) => {
       {isModalOpen && (
         <Modal
           children={
-            <CommentModal handleClose={handleClose} tweetId={tweetId} />
+            <CommentModal handleClose={handleClose} tweetId={tweetId} threadAuthor={threadAuthor} />
           }
           handleClose={handleClose}
           padding="15px"
@@ -216,6 +227,7 @@ const Activity = (props) => {
                       onClick={(e) => {
                         e.preventDefault();
                         setTweetId(tweet.id);
+                        setThreadAuthor(tweet.threadMainPost.author.id);
                         console.log(tweet.id);
                         setIsModalOpen(true);
                       }}
