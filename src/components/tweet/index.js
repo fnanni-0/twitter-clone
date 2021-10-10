@@ -51,7 +51,7 @@ const Tweet = (props) => {
                 author {
                   id
                 }
-                comments(orderBy: id, orderDirection: desc, first: 100) {
+                comments(orderBy: id, orderDirection: asc, first: 100) {
                   id
                   message
                   creationTime
@@ -165,9 +165,9 @@ const Tweet = (props) => {
             <div>
               <Link to={`/profile/${tweet.author.id}`}>
                 <h3 style={{ color: theme.color }}>
-                  {tweet.author.id}
+                  {tweet.author.id.substring(0, 10) + "..."}
                 </h3>
-                <p>@{tweet.author.id}</p>
+                <p>@{tweet.author.id.substring(0, 10) + "..."}</p>
               </Link>
             </div>
           </Flex>

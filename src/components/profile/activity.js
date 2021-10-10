@@ -169,7 +169,7 @@ const Activity = (props) => {
                     <object>
                       <Link to={`/profile/${tweet.author.id}`}>
                         <h3>
-                          {tweet.author.id}
+                          {tweet.author.id.substring(0, 10) + "..."}
                         </h3>
                       </Link>
                     </object>
@@ -181,7 +181,7 @@ const Activity = (props) => {
                         maxWidth: "18%",
                       }}
                     >
-                      @{tweet.author.id}
+                      @{tweet.author.id.substring(0, 10) + "..."}
                     </p>
                     <span>
                       {date.toLocaleString("default", { month: "short" })}{" "}

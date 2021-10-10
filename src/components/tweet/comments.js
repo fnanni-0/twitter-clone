@@ -25,11 +25,11 @@ const Comments = (props) => {
                 <object>
                   <Link to={`/profile/${comment.author.id}`}>
                     <h3>
-                      {comment.author.id}
+                      {comment.author.id.substring(0, 10) + "..."}
                     </h3>
                   </Link>
                 </object>
-                <p>@{comment.author.id}</p>
+                <p>@{comment.author.id.substring(0, 10) + "..."}</p>
                 <span>
                   {date.toLocaleString("default", { month: "long" })}{" "}
                   {date.getDate()}{" "}
