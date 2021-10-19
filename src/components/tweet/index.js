@@ -65,6 +65,18 @@ const Tweet = (props) => {
                   author {
                     id
                   }
+                  moderations(orderBy: creationTime, orderDirection: desc, first: 1) {
+                    closed
+                    bondDeadline
+                    currentWinner
+                    disputeID
+                    rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
+                      amountPaidAuthor
+                      amountPaidSnitch
+                      hasPaidAuthor
+                      hasPaidSnitch
+                    }
+                  }
                 }
               }
             }
@@ -267,7 +279,7 @@ const Tweet = (props) => {
           </Activity>
         </div>
       </TweetWrapper>
-      <Comments comments={tweet.comments}/>
+      <Comments comments={tweet.comments} threadAuthor={tweet.threadMainPost.author.id}/>
     </ProfileCorner>
   );
 };

@@ -10,7 +10,7 @@ const URL = process.env.REACT_APP_SERVER_URL;
 const Like = (props) => {
   const [likeDisabled, setLikeDisabled] = useState(false);
 
-  const token = useSelector((state) => state.profile.user.token);
+  const user = useSelector((state) => state.profile.user);
 
   const { tweets, tweet, idx, updateDetails, myId, getData } = props;
   const likePath = [
@@ -24,15 +24,7 @@ const Like = (props) => {
       // unlike
       // console.log("unlike");
       try {
-        await axios.delete(`${URL}/tweet/like/remove`, {
-          data: {
-            userId: myId,
-            tweetId: tweets[idx]["Tweets.id"],
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Remove like
         updateDetails(idx, [
           ["selfLiked", false],
           ["Tweets.likesCount", tweets[idx]["Tweets.likesCount"] - 1],
@@ -46,18 +38,7 @@ const Like = (props) => {
       // like
       // console.log("like");
       try {
-        await axios.post(
-          `${URL}/tweet/like/add`,
-          {
-            userId: myId,
-            tweetId: tweets[idx]["Tweets.id"],
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // Add like
         updateDetails(idx, [
           ["selfLiked", true],
           ["Tweets.likesCount", tweets[idx]["Tweets.likesCount"] + 1],

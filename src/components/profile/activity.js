@@ -13,9 +13,9 @@ import {
 } from "../styles/profile";
 import { isImage, isVideo } from "../../media";
 import Loading from "../loading";
-import Bookmark from "./bookmark";
 import Modal from "../modal";
 import CommentModal from "../tweet/commentModal";
+import Moderate from "./moderate";
 import makeBlockie from 'ethereum-blockies-base64';
 const { GraphQLClient, gql } = require('graphql-request');
 const graph = new GraphQLClient("https://api.thegraph.com/subgraphs/name/fnanni-0/social_kovan");
@@ -40,8 +40,6 @@ const Activity = (props) => {
     header,
     handleHeaderText,
     feed,
-    removeBookmark,
-    isBookmark,
   } = props;
 
   useEffect(() => {
@@ -57,7 +55,7 @@ const Activity = (props) => {
           gql`
             query postsQuery($account: String) {
               profile(id: $account) {
-                posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 100) {
+                posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 50) {
                   id
                   message
                   creationTime
@@ -69,6 +67,18 @@ const Activity = (props) => {
                   threadMainPost {
                     author {
                       id
+                    }
+                  }
+                  moderations(orderBy: creationTime, orderDirection: desc, first: 1) {
+                    closed
+                    bondDeadline
+                    currentWinner
+                    disputeID
+                    rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
+                      amountPaidAuthor
+                      amountPaidSnitch
+                      hasPaidAuthor
+                      hasPaidSnitch
                     }
                   }
                 }
@@ -84,7 +94,7 @@ const Activity = (props) => {
         const query = await graph.request(
           gql`
             query postsQuery {
-              posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 1000) {
+              posts(where: {groupID: null}, orderBy: id, orderDirection: desc, first: 50) {
                 id
                 message
                 creationTime
@@ -100,6 +110,18 @@ const Activity = (props) => {
                 }
                 comments {
                   id
+                }
+                moderations(orderBy: creationTime, orderDirection: desc, first: 1) {
+                  closed
+                  bondDeadline
+                  currentWinner
+                  disputeID
+                  rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
+                    amountPaidAuthor
+                    amountPaidSnitch
+                    hasPaidAuthor
+                    hasPaidSnitch
+                  }
                 }
               }
             }
@@ -133,16 +155,6 @@ const Activity = (props) => {
 
   if (!tweets) return <Loading />;
 
-  if (isBookmark && !tweets.length)
-    return (
-      <div style={{ textAlign: "center", padding: "40px 0px" }}>
-        <h3 style={{ fontSize: "19px", fontWeight: 700, color: theme.color }}>
-          You haven’t added any Tweets to your Bookmarks yet
-        </h3>
-        <p>When you do, they’ll show up here.</p>
-      </div>
-    );
-
   if (!tweets.length)
     return (
       <EmptyMsg>
@@ -174,7 +186,7 @@ const Activity = (props) => {
                 <User>
                   <UserImage src={makeBlockie(tweet.author.id)}/>
                 </User>
-                <div style={{ width: "80%" }}>
+                <div style={{ width: "65%" }}>
                   <TweetDetails color={theme.color}>
                     {/* <object> to hide nested <a> warning */}
                     <object>
@@ -232,7 +244,6 @@ const Activity = (props) => {
                         setIsModalOpen(true);
                       }}
                     />
-
                     <Retweet
                       tweets={tweets}
                       tweet={tweet}
@@ -249,13 +260,18 @@ const Activity = (props) => {
                       myId={myId}
                       getData={getData}
                     />
-                    <Bookmark
-                      tweet={tweet}
-                      myId={myId}
-                      removeBookmark={removeBookmark}
-                    />
                   </TweetDetails>
                 </div>
+                <TweetDetails style={{ justifyContent: "center" }}>
+                  <Moderate
+                    tweets={tweets}
+                    tweet={tweet}
+                    idx={idx}
+                    updateDetails={updateDetails}
+                    myId={myId}
+                    getData={getData}
+                  />
+                </TweetDetails>
               </PeopleFlex>
             </Link>
           </React.Fragment>

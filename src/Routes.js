@@ -11,8 +11,7 @@ const Notifications = React.lazy(() =>
   import("./components/notifications/index")
 );
 const Messages = React.lazy(() => import("./components/messages/index"));
-const BookMarks = React.lazy(() => import("./components/bookmarks/index"));
-const Lists = React.lazy(() => import("./components/lists/index"));
+const ModeratorHome = React.lazy(() => import("./components/moderate/index"));
 const Profile = React.lazy(() => import("./components/profile/index"));
 const Tweet = React.lazy(() => import("./components/tweet/index"));
 const Likes = React.lazy(() => import("./components/tweet/likes"));
@@ -30,13 +29,13 @@ const Routes = () => {
   const withMenuBar = (WrappedComponent) => (props) => (
     <React.Fragment>
       <Row style={{ background: theme.bg }}>
-        <Col lg={7} md={5} xs={5}>
+        <Col lg={6} md={5} xs={5}>
           <MenuBar />
         </Col>
-        <Col lg={9} md={19} xs={19}>
+        <Col lg={11} md={19} xs={19}>
           <WrappedComponent />
         </Col>
-        <Col lg={8} md={0} xs={0}>
+        <Col lg={7} md={0} xs={0}>
           <SideBar />
         </Col>
       </Row>
@@ -79,8 +78,7 @@ const Routes = () => {
           component={withMenuBar(Notifications)}
         />
         <PrivateRoute path="/messages" component={withMenuBar(Messages)} />
-        <PrivateRoute path="/bookmarks" component={withMenuBar(BookMarks)} />
-        <PrivateRoute path="/lists" component={withMenuBar(Lists)} />
+        <PrivateRoute path="/moderate" component={withMenuBar(ModeratorHome)} />
         <Route
           exact
           path="/profile/:username"

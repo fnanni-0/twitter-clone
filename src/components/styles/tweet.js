@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const TweetWrapper = styled.div`
-  border-bottom: 1px solid rgb(230, 236, 240);
+  border-bottom: 1px solid rgb(101, 119, 134);
 `;
 
 export const UserImage = styled.img`
@@ -42,7 +42,7 @@ export const ActivityInfo = styled.div`
   display: flex;
   padding-top: 15px;
   padding-bottom: 15px;
-  border-bottom: 1px solid rgb(230, 236, 240);
+  border-bottom: 1px solid rgb(101, 119, 134);
   a {
     margin-right: 10px;
     font-size: 15px;

@@ -8,19 +8,20 @@ Backend Repository - [https://github.com/RisingGeek/twitter-clone-backend](https
 
 ## Features
 
-1. Signup/Login
-2. Add Tweet
-3. Follow people
-4. Like, Retweet, comment
-5. View profile
-6. Search users in explore section
-7. Add bookmarks
-8. Dark mode
+1. Login
+1. Post Tweet
+1. Follow/trust people
+1. Like, Retweet, comment
+1. View profile
+1. Moderate
+1. Choose moderation rules for each post
 
 ## Upcoming Features
 
 1. Notifications
-2. Live updations of like, retweet
+1. Live updations of like, retweet
+1. Pay per view post
+1. Curated auctions for promoted ads, secured by escrow
 
 ## Run locally
 
@@ -32,14 +33,3 @@ Backend Repository - [https://github.com/RisingGeek/twitter-clone-backend](https
 ```
 
 - `npm install && npm start`
-
-## Demo account
-
-```javascript
-username: demoaccount
-password: 12345678
-```
-
-## Demo
-
-![Feed](demo/feed.png)
