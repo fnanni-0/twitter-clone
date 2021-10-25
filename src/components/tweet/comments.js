@@ -7,6 +7,7 @@ import Comment from "../profile/comment";
 import Modal from "../modal";
 import CommentModal from "../tweet/commentModal";
 import Moderate from "../profile/moderate";
+import ModerateModal from "../profile/moderateModal";
 import { PeopleFlex, UserImage, TweetDetails } from "../styles/profile";
 import { isImage, isVideo } from "../../media";
 import makeBlockie from 'ethereum-blockies-base64';
@@ -18,8 +19,10 @@ const Comments = (props) => {
   const user = useSelector((state) => state.profile.user);
   const myId = user.account;
   const [tweetId, setTweetId] = useState(null);
+  const [tweetIdx, setTweetIdx] = useState(null);
   const [threadAuthor, setThreadAuthor] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModerationModalOpen, setIsModerationModalOpen] = useState(false);
 
   const updateDetails = (idx, newState) => {
     // setTweets([
@@ -36,6 +39,9 @@ const Comments = (props) => {
   const handleClose = () => {
     setIsModalOpen(false);
   };
+  const handleModerationClose = () => {
+    setIsModerationModalOpen(false);
+  };
 
   return (
     <div>
@@ -48,6 +54,19 @@ const Comments = (props) => {
           padding="15px"
         />
       )}
+      {isModerationModalOpen && (
+        <Modal
+          heading="Post Moderation"
+          children={
+            <ModerateModal 
+              handleClose={handleModerationClose} 
+              tweet={props.comments[tweetIdx]} 
+            />
+          }
+          handleClose={handleModerationClose}
+          padding="15px"
+        />
+      )}
       {props.comments.map((comment, idx) => {
         const date = new Date(comment.creationTime * 1000);
         return (
@@ -55,7 +74,7 @@ const Comments = (props) => {
             <div>
               <UserImage src={makeBlockie(comment.author.id)} />
             </div>
-            <div style={{ width: "65%" }}>
+            <div style={{ width: "80%" }}>
               <TweetDetails color={theme.color}>
                 {/* <object> to hide nested <a> warning */}
                 <object>
@@ -99,12 +118,12 @@ const Comments = (props) => {
                   onClick={(e) => {
                     e.preventDefault();
                     setTweetId(comment.id);
+                    setTweetIdx(idx);
                     setThreadAuthor(props.threadAuthor);
                     console.log(comment.id);
                     setIsModalOpen(true);
                   }}
                 />
-
                 <Retweet
                   tweets={props.comments}
                   tweet={comment}
@@ -121,18 +140,19 @@ const Comments = (props) => {
                   myId={myId}
                   getData={() => {}}
                 />
+                <Moderate
+                  tweets={props.comments}
+                  tweet={comment}
+                  idx={idx}
+                  updateDetails={updateDetails}
+                  myId={myId}
+                  showModerationModal={() => {
+                    setTweetIdx(idx);
+                    setIsModerationModalOpen(true);
+                  }}
+                />
               </TweetDetails>
             </div>
-            <TweetDetails style={{ justifyContent: "center" }}>
-              <Moderate
-                tweets={props.comments}
-                tweet={comment}
-                idx={idx}
-                updateDetails={updateDetails}
-                myId={myId}
-                getData={() => {}}
-              />
-            </TweetDetails>
           </PeopleFlex>
         );
       })}

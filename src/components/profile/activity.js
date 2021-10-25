@@ -75,10 +75,8 @@ const Activity = (props) => {
                     currentWinner
                     disputeID
                     rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
-                      amountPaidAuthor
-                      amountPaidSnitch
-                      hasPaidAuthor
-                      hasPaidSnitch
+                      amountPaid
+                      hasPaid
                     }
                   }
                 }
@@ -117,10 +115,8 @@ const Activity = (props) => {
                   currentWinner
                   disputeID
                   rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
-                    amountPaidAuthor
-                    amountPaidSnitch
-                    hasPaidAuthor
-                    hasPaidSnitch
+                    amountPaid
+                    hasPaid
                   }
                 }
               }
@@ -186,7 +182,7 @@ const Activity = (props) => {
                 <User>
                   <UserImage src={makeBlockie(tweet.author.id)}/>
                 </User>
-                <div style={{ width: "65%" }}>
+                <div style={{ width: "80%" }}>
                   <TweetDetails color={theme.color}>
                     {/* <object> to hide nested <a> warning */}
                     <object>
@@ -260,18 +256,16 @@ const Activity = (props) => {
                       myId={myId}
                       getData={getData}
                     />
+                    <Moderate
+                      tweets={tweets}
+                      tweet={tweet}
+                      idx={idx}
+                      updateDetails={updateDetails}
+                      myId={myId}
+                      getData={() => {}}
+                    />
                   </TweetDetails>
                 </div>
-                <TweetDetails style={{ justifyContent: "center" }}>
-                  <Moderate
-                    tweets={tweets}
-                    tweet={tweet}
-                    idx={idx}
-                    updateDetails={updateDetails}
-                    myId={myId}
-                    getData={getData}
-                  />
-                </TweetDetails>
               </PeopleFlex>
             </Link>
           </React.Fragment>

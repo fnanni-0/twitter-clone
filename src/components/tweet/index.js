@@ -71,10 +71,8 @@ const Tweet = (props) => {
                     currentWinner
                     disputeID
                     rounds(orderBy: creationTime, orderDirection: desc, first: 1) {
-                      amountPaidAuthor
-                      amountPaidSnitch
-                      hasPaidAuthor
-                      hasPaidSnitch
+                      amountPaid
+                      hasPaid
                     }
                   }
                 }
