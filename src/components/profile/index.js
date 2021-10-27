@@ -122,7 +122,7 @@ const Profile = (props) => {
   const tabList = [
     {
       name: "tweets",
-      title: "Tweets",
+      title: "Posts",
       path: undefined,
     },
     {
@@ -148,7 +148,7 @@ const Profile = (props) => {
             <Activity
               url={`${URL}/user/get-tweets?userId=${user.id}&myId=${myId}`}
               dataKey="tweets"
-              header="Tweets"
+              header="Posts"
               handleHeaderText={handleHeaderText}
             />
           </div>

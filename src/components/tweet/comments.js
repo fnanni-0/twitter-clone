@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Like from "../profile/like";
 import Retweet from "../profile/retweet";
 import Comment from "../profile/comment";
+import MessageDisplay from "../profile/messageDisplay";
 import Modal from "../modal";
 import CommentModal from "../tweet/commentModal";
 import Moderate from "../profile/moderate";
@@ -92,7 +93,7 @@ const Comments = (props) => {
                     date.getFullYear()}
                 </span>
               </TweetDetails>
-              <div style={{color:theme.color}}>{comment.message}</div>
+              <MessageDisplay tweet={comment}/>
               {comment["Comments.media"] &&
                 isImage(comment["Comments.media"]) && (
                   <img

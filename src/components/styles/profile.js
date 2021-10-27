@@ -146,16 +146,57 @@ export const ImgFlex = styled.div`
 export const Button = styled.button`
   background: ${(props) => props.bg};
   border: 1px solid rgb(29, 161, 242);
-  border-radius: 50px;
+  border-radius: 3px;
   font-size: 15px;
   font-weight: bold;
   color: rgb(29, 161, 242);
   text-align: center;
-  padding: 1% 3%;
   outline: none;
   cursor: pointer;
   &:hover {
     background: rgba(26, 145, 218, 0.1);
+  }
+`;
+
+export const PlainButton = styled.button`
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  color: rgb(101, 119, 134);
+  text-align: center;
+  padding: 10px 15px;
+  &:hover {
+    background: rgba(26, 145, 218, 0.1);
+  }
+`;
+
+export const WarningBox = styled.div`
+background: rgb(26,22,30);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  h3:hover {
+    text-decoration: underline;
+  }
+  p {
+    color: rgb(101, 119, 134);
+    font-weight: 400;
+    font-size: 15px;
+    padding: 10px 15px;
+  }
+  h3,
+  p {
+    margin: 0;
+    line-height: 1.23;
   }
 `;
 

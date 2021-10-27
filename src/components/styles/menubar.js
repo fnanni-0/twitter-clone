@@ -62,7 +62,7 @@ export const Button = styled.button`
   ${(props) => props.height && `height: ${props.height}`};
   background: rgba(29, 161, 242, 1);
   border: none;
-  border-radius: 50px;
+  border-radius: 3px;
   outline: none;
   font-size: 15px;
   font-weight: bold;

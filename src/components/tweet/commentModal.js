@@ -86,7 +86,7 @@ const CommentModal = (props) => {
       <div style={{ width: "100%" }}>
         <textarea
           rows={rows || 5}
-          placeholder="Tweet your reply"
+          placeholder="Post your reply"
           value={text}
           onChange={(e) => {
             setText(e.target.value);

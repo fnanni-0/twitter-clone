@@ -117,7 +117,7 @@ const MenuBar = () => {
             padding="12px 30px"
             onClick={() => setIsModalOpen(true)}
           >
-            Tweet
+            Post
           </Button>
         )}
         <div style={{ marginBottom: "10px" }}></div>

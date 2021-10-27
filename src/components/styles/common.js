@@ -82,7 +82,7 @@ export const Col = styled.div`
 export const Button = styled.button`
   background: ${(props) => props.bg};
   border: ${(props) => props.border || "none"};
-  border-radius: 50px;
+  border-radius: 3px;
   outline: none;
   font-size: 15px;
   font-weight: bold;

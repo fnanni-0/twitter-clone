@@ -63,7 +63,7 @@ export const UserFlex = styled.div`
 export const Button = styled.button`
   background-color: transparent;
   border: 1px solid rgb(29, 161, 242);
-  border-radius: 50px;
+  border-radius: 3px;
   padding: 5px 12px;
   cursor: pointer;
   outline: none;

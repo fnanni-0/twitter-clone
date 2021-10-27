@@ -170,7 +170,7 @@ const Tweet = (props) => {
           padding="15px"
         />
       )}
-      <ProfileHeader heading="Tweet" />
+      <ProfileHeader heading="Post" />
       <TweetWrapper>
         <div style={{ padding: "10px 15px 0px 15px" }}>
           <Flex>

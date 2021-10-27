@@ -133,6 +133,7 @@ const ModerateModal = (props) => {
 
   if (tweet.disputed) {
     // If dispute is ongoing, go to centralized arbitrator.
+    // window.open("https://centralizedarbitrator.netlify.app/");
     return (
       <Flex bg={theme.bg} color={theme.color}>
         <div style={{ width: "100%" }}>

@@ -3,14 +3,15 @@ import { SET_THEME } from "../actions";
 const themes = {
   default: {
     mode: "default",
-    bg: "rgb(0,0,0)",
+    bg: "rgb(8,2,11)",
+    boxBg: "rgb(26,22,30)",
     color: "rgb(255,255,255)",
     lightBg: "rgba(29,161,242,1)",
     darkBg: "rgb(26,145,218)",
     defaultBg: "rgb(29,161,242)",
     opaqueBg: "rgba(29, 161, 242, 0.1)",
     border: "rgb(47, 51, 54)",
-    tweetHov: "rgb(21, 24, 28)",
+    tweetHov: "rgb(16,12,20)",
     para: "rgb(110, 118, 125)",
     modalBg: "rgba(110, 118, 125, 0.4)",
     boxShadow:
