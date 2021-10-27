@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Like from "./like";
 import Retweet from "./retweet";
 import Comment from "./comment";
+import MessageDisplay from "./messageDisplay";
 import {
   PeopleFlex,
   TweetDetails,
@@ -171,6 +172,9 @@ const Activity = (props) => {
         />
       )}
       {tweets.map((tweet, idx) => {
+        if (tweet.disputed && tweet.ruling == "Reject" && tweet.moderations[0].closed) {
+          return null;
+        }
         const date = new Date(tweet.creationTime * 1000);
         return (
           <React.Fragment key={tweet.id}>
@@ -209,9 +213,7 @@ const Activity = (props) => {
                         date.getFullYear()}
                     </span>
                   </TweetDetails>
-                  <div style={{ color: theme.color }}>
-                    {tweet.message}
-                  </div>
+                  <MessageDisplay tweet={tweet}/>
                   {tweet["Tweets.media"] && isImage(tweet["Tweets.media"]) && (
                     <img
                       src={tweet["Tweets.media"]}

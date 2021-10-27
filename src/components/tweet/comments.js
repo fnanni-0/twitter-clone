@@ -69,6 +69,9 @@ const Comments = (props) => {
         />
       )}
       {props.comments.map((comment, idx) => {
+        if (comment.disputed && comment.ruling == "Reject" && comment.moderations[0].closed) {
+          return null;
+        }
         const date = new Date(comment.creationTime * 1000);
         return (
           <PeopleFlex hover key={comment.id} border={theme.border} tweetHov={theme.tweetHov}>
