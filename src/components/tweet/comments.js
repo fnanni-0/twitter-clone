@@ -74,7 +74,7 @@ const Comments = (props) => {
         }
         const date = new Date(comment.creationTime * 1000);
         return (
-          <PeopleFlex hover key={comment.id} border={theme.border} tweetHov={theme.tweetHov}>
+          <PeopleFlex hover key={comment.id} tweetHov={theme.tweetHov}>
             <div>
               <UserImage src={makeBlockie(comment.author.id)} />
             </div>

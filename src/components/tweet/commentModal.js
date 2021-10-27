@@ -80,7 +80,7 @@ const CommentModal = (props) => {
           src={makeBlockie(user.account)}
           width="49px"
           height="49px"
-          style={{ borderRadius: "50%" }}
+          style={{ borderRadius: "10%" }}
         />
       </div>
       <div style={{ width: "100%" }}>

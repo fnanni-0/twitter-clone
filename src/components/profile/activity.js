@@ -182,7 +182,7 @@ const Activity = (props) => {
               key={tweet.id}
               to={`/${tweet.author.id}/status/${tweet.id}`}
             >
-              <PeopleFlex hover border={theme.border} tweetHov={theme.tweetHov}>
+              <PeopleFlex hover tweetHov={theme.tweetHov}>
                 <User>
                   <UserImage src={makeBlockie(tweet.author.id)}/>
                 </User>

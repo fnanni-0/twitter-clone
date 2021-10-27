@@ -35,7 +35,7 @@ export const UserFlex = styled.div`
   img {
     width: 49px;
     height: 49px;
-    border-radius: 50%;
+    border-radius: 10%;
     margin-right: 10px;
   }
   h3,

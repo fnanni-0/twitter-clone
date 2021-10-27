@@ -125,7 +125,7 @@ export const Avatar = styled.div`
   background-image: url(${(props) => props.backgroundImage});
   background-size: cover;
   border: ${(props) => `4px solid ${props.bg}`};
-  border-radius: 50%;
+  border-radius: 10%;
   margin-top: -13%;
   @media (max-width: 768px) {
     margin-top: -10%;
@@ -224,7 +224,7 @@ export const User = styled.div`
 export const UserImage = styled.img`
   width: 49px;
   height: 49px;
-  border-radius: 50%;
+  border-radius: 10%;
   margin-right: 10px;
 `;
 
