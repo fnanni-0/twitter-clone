@@ -118,9 +118,8 @@ const TweetModal = (props) => {
               ]}
               placeholder="Policy..."
               onChange={(optionSelected) => {
-                console.log(optionSelected.value);
                 setRulesSelected(optionSelected.value);
-                if (rulesSelected != "" && text != "") setIsTweetDisabled(false);
+                if (optionSelected.value != "" && text != "") setIsTweetDisabled(false);
               }}
             />
             </div>
