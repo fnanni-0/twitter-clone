@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import Select from 'react-select';
 import { toast } from "react-toastify";
 import UploadButton from "../uploadButton";
 import { Flex, Button } from "../styles/modal";
@@ -10,7 +11,31 @@ import { socialAddress } from "../../contracts";
 import makeBlockie from 'ethereum-blockies-base64';
 
 const TweetModal = (props) => {
+  const dropdownCustomStyles = {
+    menu: (provided, state) => ({
+      ...provided,
+      width: state.selectProps.width,
+      color: "rgb(255,255,255)",
+      backgroundColor: "rgb(26,22,30)",
+      border: "1px solid rgb(29, 161, 242)"
+    }),
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: "rgb(26,22,30)",
+      border: "1px solid rgb(29, 161, 242)"
+    }),
+    option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
+      ...styles,
+      backgroundColor: isFocused ? "rgb(56,52,60)" : undefined
+    }),
+    singleValue: (provided, state) => ({
+      ...provided,
+      color: "rgb(255,255,255)"
+    })
+  }
+
   const [text, setText] = useState("");
+  const [rulesSelected, setRulesSelected] = useState("");
   const [isTweetDisabled, setIsTweetDisabled] = useState(true);
   const [rulesID, setRulesID] = useState(0);
   const [preview, setPreview] = useState({ image: "", video: "", media: null });
@@ -52,7 +77,7 @@ const TweetModal = (props) => {
             value={text}
             onChange={(e) => {
               setText(e.target.value);
-              e.target.value
+              e.target.value && rulesSelected != ""
                 ? setIsTweetDisabled(false)
                 : setIsTweetDisabled(true);
             }}
@@ -82,6 +107,22 @@ const TweetModal = (props) => {
                 onChange={handlePhoto}
                 style={{ display: "none" }}
               />
+            </div>
+            <div>
+            <Select
+              styles={dropdownCustomStyles}
+              options={[
+                { value: 'polite', label: 'Be nice' },
+                { value: 'memes', label: 'Only memes' },
+                { value: 'nsfw', label: 'NSFW' }
+              ]}
+              placeholder="Policy..."
+              onChange={(optionSelected) => {
+                console.log(optionSelected.value);
+                setRulesSelected(optionSelected.value);
+                if (rulesSelected != "" && text != "") setIsTweetDisabled(false);
+              }}
+            />
             </div>
             <div>
               <Button
