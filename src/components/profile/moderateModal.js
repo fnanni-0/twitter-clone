@@ -141,10 +141,13 @@ const ModerateModal = (props) => {
   if (tweet.disputed) {
     // If dispute is ongoing, go to centralized arbitrator.
     // window.open("https://centralizedarbitrator.netlify.app/");
+    const bodyText = `This moderation market is being disputed on Kleros courts.\n
+                      Arbitrator: 0x485a8da9e76092299e6c5f04deb8c3b3bbf23f04.\n
+                      Court: Centralized arbitrator.\n`;
     return (
       <Flex bg={theme.bg} color={theme.color}>
         <div style={{ width: "100%" }}>
-          <p style={{ color: theme.color }}>{bodyText}</p>
+          <NewlineText color={theme.color} text={bodyText} />
           <div>
             <input type="checkbox" id="agree" onChange={checkboxHandler} />
             <label htmlFor="agree" style={{ color: theme.color }}> I understand that I can lose my deposit.</label>

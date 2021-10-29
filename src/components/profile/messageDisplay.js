@@ -36,7 +36,21 @@ const MessageDisplay = (props) => {
     }
   }
 
-  if (ongoingModeration && hidePost) {
+  if (tweet.disputed && hidePost) {
+    const warningMessage = "Moderation dispute ongoing on Kleros."
+    return (
+        <WarningBox>
+          <p>{warningMessage}</p>
+        <PlainButton
+          onClick={showPost}
+          defaultBg={theme.defaultBg}
+          darkBg={theme.darkBg}
+        >
+          Show
+        </PlainButton>
+        </WarningBox>
+    );
+  } else if (ongoingModeration && hidePost) {
     const warningMessage = "This post is being moderated."
     return (
         <WarningBox>
@@ -49,7 +63,6 @@ const MessageDisplay = (props) => {
           Show
         </PlainButton>
         </WarningBox>
-        
     );
   } else {
     return (

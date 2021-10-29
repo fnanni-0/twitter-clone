@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import { toast } from "react-toastify";
 import Icon from "../icon";
 import { Text } from "../styles/profile";
 import { ActivityBox, ActivityIcon } from "../styles/common";
@@ -18,36 +18,7 @@ const Like = (props) => {
   ];
 
   const handleLike = async (e, idx) => {
-    e.preventDefault();
-    setLikeDisabled(true);
-    if (tweets[idx].selfLiked) {
-      // unlike
-      // console.log("unlike");
-      try {
-        // Remove like
-        updateDetails(idx, [
-          ["selfLiked", false],
-          ["Tweets.likesCount", tweets[idx]["Tweets.likesCount"] - 1],
-        ]);
-        getData && getData();
-        setLikeDisabled(false);
-      } catch (err) {
-        setLikeDisabled(false);
-      }
-    } else {
-      // like
-      // console.log("like");
-      try {
-        // Add like
-        updateDetails(idx, [
-          ["selfLiked", true],
-          ["Tweets.likesCount", tweets[idx]["Tweets.likesCount"] + 1],
-        ]);
-        setLikeDisabled(false);
-      } catch (err) {
-        setLikeDisabled(false);
-      }
-    }
+    toast("Not implemented");
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Icon from "../icon";
 import { Text } from "../styles/profile";
 import { ActivityBox, ActivityIcon } from "../styles/common";
@@ -18,55 +19,7 @@ const Retweet = (props) => {
   ];
 
   const handleRetweet = async (e, idx) => {
-    e.preventDefault();
-    setRetweetDisabled(true);
-    if (tweets[idx].selfRetweeted) {
-      // unretweet
-      // console.log("unretweet");
-      try {
-        await axios.delete(`${URL}/tweet/retweet/remove`, {
-          data: {
-            userId: myId,
-            tweetId: tweets[idx]["Tweets.id"],
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        updateDetails(idx, [
-          ["selfRetweeted", false],
-          ["Tweets.retweetsCount", tweets[idx]["Tweets.retweetsCount"] - 1],
-        ]);
-        getData && getData();
-        setRetweetDisabled(false);
-      } catch (err) {
-        setRetweetDisabled(false);
-      }
-    } else {
-      // retweet
-      // console.log("retweet");
-      try {
-        await axios.post(
-          `${URL}/tweet/retweet/add`,
-          {
-            userId: myId,
-            tweetId: tweets[idx]["Tweets.id"],
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        updateDetails(idx, [
-          ["selfRetweeted", true],
-          ["Tweets.retweetsCount", tweets[idx]["Tweets.retweetsCount"] + 1],
-        ]);
-        setRetweetDisabled(false);
-      } catch (err) {
-        setRetweetDisabled(false);
-      }
-    }
+    toast("Not implemented");
   };
 
   return (
