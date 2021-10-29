@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Icon from "../icon";
+import { ethers } from "ethers";
 import { Text } from "../styles/profile";
 import { ActivityBox, ActivityIcon } from "../styles/common";
 
@@ -34,8 +35,12 @@ const Moderate = (props) => {
         ongoingModeration = false;
       } else if (Date.now() / 1000 < moderation.bondDeadline) {
         const amountPaid = moderation.rounds[0].amountPaid;
-        const winningAmount = amountPaid[1] < amountPaid[2] ? amountPaid[2] : amountPaid[1];
-        displayAmount = `$${ethers.BigNumber.from(ethers.utils.formatEther(winningAmount))}`;
+        const amountAuthor = ethers.BigNumber.from(amountPaid[1]
+        );
+        const amountSnitch = ethers.BigNumber.from(amountPaid[2]
+        );
+        const winningAmount = amountAuthor.gt(amountSnitch) ? amountAuthor : amountSnitch;
+        displayAmount = `$${ethers.utils.formatEther(winningAmount)}`;
       } else {
         // Market needs to be resolved
       }

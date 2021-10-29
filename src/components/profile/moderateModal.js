@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import Icon from "../icon";
 import { Text } from "../styles/profile";
 import { Flex, Button } from "../styles/modal";
-import { ActivityBox, ActivityIcon } from "../styles/common";
 import { ethers } from "ethers";
 import socialContractAbi from "../../abi/Social.json";
 import arbitratorContractAbi from "../../abi/Arbitrator.json";
@@ -45,26 +44,30 @@ const ModerateModal = (props) => {
   }
 
   const loadData = async () => {
-    const extraData = await social.arbitratorExtraData();
-    const arbitrationCost = await arbitrator.arbitrationCost(extraData);
-    const totalCost = arbitrationCost.mul(3).div(2);
+    if (depositRequired.eq(ethers.BigNumber.from(0))) {
+      const extraData = await social.arbitratorExtraData();
+      const arbitrationCost = await arbitrator.arbitrationCost(extraData);
+      const totalCost = arbitrationCost.mul(3).div(2);
 
-    if (tweet.moderations.length == 0) {
-      setdepositRequired(totalCost.div(16));
-    } else if (tweet.moderations[0].closed) {
-      setdepositRequired(totalCost.div(16));
-    } else {
-      const amountAuthor = ethers.BigNumber.from(
-        tweet.moderations[0].rounds[0].amountPaid[1]
-      );
-      const totalRequired = amountAuthor.mul(2).gt(totalCost) ? totalCost : amountAuthor.mul(2);
-      setdepositRequired(
-        totalRequired.sub(
-          ethers.BigNumber.from(
-            tweet.moderations[0].rounds[0].amountPaid[2]
+      if (tweet.moderations.length == 0) {
+        setdepositRequired(totalCost.div(16));
+      } else if (tweet.moderations[0].closed) {
+        setdepositRequired(totalCost.div(16));
+      } else {
+        const amountAuthor = ethers.BigNumber.from(
+          tweet.moderations[0].rounds[0].amountPaid[1]
+        );
+        const amountSnitch = ethers.BigNumber.from(
+          tweet.moderations[0].rounds[0].amountPaid[2]
+        );
+        const currentAmount = amountAuthor.gt(amountSnitch) ? amountAuthor : amountSnitch;
+        const currentLoserAmount = amountAuthor.gt(amountSnitch) ? amountSnitch : amountAuthor;
+        const totalRequired = currentAmount.mul(2).gt(totalCost) ? totalCost : currentAmount.mul(2);
+        setdepositRequired(
+          totalRequired.sub(currentLoserAmount
           )
-        )
-      );
+        );
+      }
     }
   }
 
@@ -85,6 +88,15 @@ const ModerateModal = (props) => {
     await social.moderatePost(tweet.id, 1, {
       value: depositRequired
     });
+
+    setButtonDisabled(false);
+    handleClose();
+  };
+
+  const resolveMarket = async (e, idx) => {
+    e.preventDefault();
+    setButtonDisabled(true);
+    await social.resolveModerationMarket(tweet.id);
 
     setButtonDisabled(false);
     handleClose();
@@ -112,24 +124,19 @@ const ModerateModal = (props) => {
         }
       } else if (currentTime < moderation.bondDeadline) {
         const round = moderation.rounds[0];
-        amountPaidAuthor = round.amountPaid[1] / 1000000000000000;
-        amountPaidSnitch = round.amountPaid[2] / 1000000000000000;
+        amountPaidAuthor = round.amountPaid[1];
+        amountPaidSnitch = round.amountPaid[2];
         if (amountPaidAuthor < amountPaidSnitch) {
           canUpvote = true;
         } else {
           canDownvote = true;
         }
         timeRemaining = moderation.bondDeadline - currentTime;
-        console.log(round.amountPaid);
       }
     }
   }
 
   loadData();
-  console.log(amountPaidAuthor);
-  console.log(amountPaidSnitch);
-  console.log(depositRequired);
-  console.log(ethers.utils.formatEther( depositRequired ));
 
   if (tweet.disputed) {
     // If dispute is ongoing, go to centralized arbitrator.
@@ -162,11 +169,31 @@ const ModerateModal = (props) => {
     let bodyText;
     if (firstModerationEvent) {
       bodyText = `In order to support this post validity, a deposit of at least ${ethers.utils.formatEther(depositRequired)} DAI is required. The reporter's side has then 24 hours to double the deposit. If it does, the post is considered reported again until someone doubles the deposit in favor of the author. After a few rounds a Kleros dispute is raised. The winner side gets reimburse and earns the loser's deposit.`;
+    } else if (timeRemaining == null) {
+      bodyText = "Time's up! You can create a new moderation market, but first close the current one."
+      return (
+        <Flex bg={theme.bg} color={theme.color}>
+          <div style={{ width: "100%" }}>
+            <NewlineText color={theme.color} text={bodyText} />
+            <Flex style={{ alignItems: "center", justifyContent: "flex-end" }}>
+              <div>
+                <Button
+                  onClick={resolveMarket}
+                  defaultBg={theme.defaultBg}
+                  darkBg={theme.darkBg}
+                >
+                  Resolve market
+                </Button>
+              </div>
+            </Flex>
+          </div>
+        </Flex>
+      );
     } else {
       const hours = Math.floor(timeRemaining / (60 * 60));
       const minutes = Math.floor((timeRemaining % (60 * 60)) / 60);
-      bodyText = `Author's stake:   ${amountPaidAuthor} DAI.\n
-                  Reporter's stake: ${amountPaidSnitch} DAI.\n
+      bodyText = `Author's stake:   ${ethers.utils.formatEther(amountPaidAuthor)} DAI.\n
+                  Reporter's stake: ${ethers.utils.formatEther(amountPaidSnitch)} DAI.\n
                   Time remaining: ${hours}h ${minutes}m.\n
                   In order to stake in favour of the author's side, a deposit of at least ${ethers.utils.formatEther(depositRequired)} DAI is required.`;
     }
@@ -199,11 +226,31 @@ const ModerateModal = (props) => {
     let bodyText;
     if (firstModerationEvent) {
       bodyText = `In order to report this post, a deposit of at least ${ethers.utils.formatEther( depositRequired )} DAI is required. The author's side has then 24 hours to double the deposit. If it does, the post is considered valid again until someone doubles the deposit in favor of the reporter. After a few rounds a Kleros dispute is raised. The winner side gets reimburse and earns the loser's deposit.`;
+    } else if (timeRemaining == null) {
+      bodyText = "Time's up! You can create a new moderation market, but first close the current one."
+      return (
+        <Flex bg={theme.bg} color={theme.color}>
+          <div style={{ width: "100%" }}>
+            <NewlineText color={theme.color} text={bodyText} />
+            <Flex style={{ alignItems: "center", justifyContent: "flex-end" }}>
+              <div>
+                <Button
+                  onClick={resolveMarket}
+                  defaultBg={theme.defaultBg}
+                  darkBg={theme.darkBg}
+                >
+                  Resolve market
+                </Button>
+              </div>
+            </Flex>
+          </div>
+        </Flex>
+      );
     } else {
       const hours = Math.floor(timeRemaining / (60 * 60));
       const minutes = Math.floor((timeRemaining % (60 * 60)) / 60);
-      bodyText = `Author's stake:   ${amountPaidAuthor} DAI.\n
-                  Reporter's stake: ${amountPaidSnitch} DAI.\n
+      bodyText = `Author's stake:   ${ethers.utils.formatEther(amountPaidAuthor)} DAI.\n
+                  Reporter's stake: ${ethers.utils.formatEther(amountPaidSnitch)} DAI.\n
                   Time remaining: ${hours}h ${minutes}m.\n
                   In order to stake in favour of the author's side, a deposit of at least ${ethers.utils.formatEther(depositRequired)} DAI is required.`;
     }
