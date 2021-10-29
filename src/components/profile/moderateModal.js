@@ -126,7 +126,7 @@ const ModerateModal = (props) => {
         const round = moderation.rounds[0];
         amountPaidAuthor = round.amountPaid[1];
         amountPaidSnitch = round.amountPaid[2];
-        if (amountPaidAuthor < amountPaidSnitch) {
+        if (ethers.BigNumber.from(amountPaidAuthor).lt(ethers.BigNumber.from(amountPaidSnitch))) {
           canUpvote = true;
         } else {
           canDownvote = true;
@@ -214,7 +214,7 @@ const ModerateModal = (props) => {
                 defaultBg={theme.defaultBg}
                 darkBg={theme.darkBg}
               >
-                Report
+                Support post
               </Button>
             </div>
           </Flex>
